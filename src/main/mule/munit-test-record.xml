@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="26466750-236a-4297-834f-8196b9968b75" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="1d802d1b-fa3a-4623-8e74-556f3c912d96" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="12345" database="poc-1" />
+	</db:config>
+	<configuration doc:name="Configuration" doc:id="743a5d55-142b-4f83-8cec-2ae6487e04e2" defaultErrorHandler-ref="munit-test-recordError_Handler" />
+	<flow name="munit-test-recordFlow" doc:id="9976b9d4-7a92-4831-9c91-de0ff2f89d64" >
+		<http:listener doc:name="Listener" doc:id="aa6c64ea-3b53-4890-9925-f3c8af24969b" config-ref="HTTP_Listener_config" path="/test">
+			<http:error-response >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-variable value="#[payload.Name]" doc:name="Set Variable" doc:id="58bc2a61-b409-4b55-8a9f-5559527a3e28" variableName="dname"/>
+		<db:select doc:name="Select" doc:id="2799a93f-7cd5-46d5-a278-555331d0b623" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM DOCTOR WHERE Name =:Name;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"Name" : vars.dname
+}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="2b7f6dfd-c736-4b85-8eff-8d93c3e71249" >
+			<when expression="#[sizeOf(payload) &gt; 0]">
+				<ee:transform doc:name="Transform Message" doc:id="d4539e2e-0417-4bb3-8d88-10762e06a2d6" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="e2334944-1b81-441a-affe-740f808fed77" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "no records found"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<error-handler  ref="munit-test-recordError_Handler"/>
+	</flow>
+	<error-handler name="munit-test-recordError_Handler" doc:id="219aa31c-819f-4ed9-8eec-0d3a1629f5ac" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cdb5a998-96a3-48d9-9024-2b5c4b384811" type="DB:CONNECTIVITY">
+			<ee:transform doc:name="Transform Message" doc:id="a0a73789-d6b1-41df-a4b5-6d8d5b4ba3d9" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"error" : "DB CONNECTIVITY"
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>

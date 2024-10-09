@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="munit-test-record-suite.xml" />
+	<munit:test name="munit-test-recordFlow-test-success" doc:id="a093cb6f-f011-4d02-adb2-7217c84cb53d" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Select" doc:id="60fc308b-ec81-43f5-b1aa-0173f2357c69" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2799a93f-7cd5-46d5-a278-555331d0b623" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://munittestrecordFlowtestsuccess\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					<munit-tools:variables >
+						<munit-tools:variable key="dname" value="#[output application/json --- readUrl('classpath://munittestrecordFlowtestsuccess\mock_variable_.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="b23a6f0f-aa99-4a38-b06b-d747db66dc74" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://munittestrecordFlowtestsuccess\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://munittestrecordFlowtestsuccess\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to munit-test-recordFlow" doc:id="636e80b8-a091-4146-9192-051d333f09d7" name="munit-test-recordFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="56f8e508-27ec-4d4b-b304-72471d366f8c" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import munittestrecordFlowtestsuccess::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="munit-test-recordFlow-test-no-records-found" doc:id="6f4c930d-85ab-4825-82c4-29a1e9b2f4f8" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Select" doc:id="39eab44c-df64-4413-a5e2-81ac7acee72c" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2799a93f-7cd5-46d5-a278-555331d0b623" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://munittestrecordFlowtestnorecordsfound\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					<munit-tools:variables >
+						<munit-tools:variable key="dname" value="#[output application/json --- readUrl('classpath://munittestrecordFlowtestnorecordsfound\mock_variable_.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="f1eb63aa-55a1-4150-9841-b577beee1f69" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://munittestrecordFlowtestnorecordsfound\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://munittestrecordFlowtestnorecordsfound\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to munit-test-recordFlow" doc:id="ed339eb2-4d78-4ae1-b387-61b0cc9ee550" name="munit-test-recordFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="56d59f9c-6efd-4d6a-bbb8-0ae29ccd194d" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import munittestrecordFlowtestnorecordsfound::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="munit-test-recordFlow-test-errors" doc:id="ec8e2191-6a28-475a-ac24-98e94fdc1b43" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Select" doc:id="65412dbb-859f-41c9-b370-f43be1101454" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2799a93f-7cd5-46d5-a278-555331d0b623" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					
+					<munit-tools:error typeId="DB:CONNECTIVITY" />
+					<munit-tools:variables >
+						<munit-tools:variable key="dname" value="#[output application/json --- readUrl('classpath://munittestrecordFlowtestnorecordsfound\mock_variable_.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="fda40939-f020-4c0c-8ef2-31cd611f7ad3" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://munittestrecordFlowtestnorecordsfound\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://munittestrecordFlowtestnorecordsfound\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution>
+			<try doc:name="Try" doc:id="68c63510-dc7b-414b-8c14-0631f57afc29" >
+				<flow-ref doc:name="Flow-ref to munit-test-recordFlow" doc:id="c9faef38-8ede-4b02-b5c3-0236bdaba1c8" name="munit-test-recordFlow" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="73032a25-cacc-4c72-8dc3-598ff657148f" >
+						<logger level="INFO" doc:name="Logger" doc:id="3b0e9764-1119-4f4b-a544-d6a8468a8ae6" message="continue....................."/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="07cf931a-697e-41e5-ab24-da4e64db09fb" is="#[MunitTools::equalTo('DB CONNECTIVITY')]" expression="#[payload.error]"/>
+
+		</munit:validation>
+	
+</munit:test>
+</mule>
